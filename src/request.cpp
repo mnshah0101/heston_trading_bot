@@ -60,8 +60,6 @@ json makeHttpRequest(const std::string &url, const std::map<std::string, std::st
         }
 
 
-    
-
 
         
 
