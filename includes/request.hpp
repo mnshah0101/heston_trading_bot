@@ -3,8 +3,12 @@
 
 #include <string>
 #include <map>
+#include "json.hpp"
+
+using json = nlohmann::json;
+// for convenience
 
 // Declaration of the function
-std::string makeHttpRequest(const std::string &url, const std::map<std::string, std::string> &arguments, const std::string &method);
+json makeHttpRequest(const std::string &url, const std::map<std::string, std::string> &arguments, const std::string &method);
 
 #endif // FUNCTIONS_H
