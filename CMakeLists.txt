@@ -16,6 +16,7 @@ include_directories(includes)
 # Find libcurl package
 find_package(CURL REQUIRED)
 
+
 # Add the executable
 
 # Link libcurl to the executable
@@ -28,3 +29,5 @@ add_executable(${EXEC} ${SOURCES})
 
 # Link libcurl to the executable
 target_link_libraries(${EXEC} ${CURL_LIBRARIES})
+
+

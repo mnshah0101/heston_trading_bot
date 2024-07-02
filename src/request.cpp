@@ -3,7 +3,8 @@
 #include <stddef.h>
 #include <iostream>
 #include <map>
-
+#include <readenv.hpp>
+#include <string>
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -17,6 +18,23 @@ std::string makeHttpRequest(const std::string &url, const std::map<std::string, 
     CURLcode res;
     std::string readBuffer;
 
+    std::unordered_map<std::string, std::string> env = readEnvFile(".env");
+
+    std::string apiKeyId = env["ALPACA_API_KEY"];
+    std::string apiSecretKey = env["ALPACA_SECRET_KEY"];
+
+    std::cout << " API Key: " << apiKeyId << std::endl;
+    std::cout << " API Secret Key: " << apiSecretKey << std::endl;
+
+
+
+
+    std::cout << "Making HTTP request to: " << url << std::endl;
+
+
+
+
+    // Initialize curl session
     curl = curl_easy_init();
     if (curl)
     {
@@ -39,8 +57,11 @@ std::string makeHttpRequest(const std::string &url, const std::map<std::string, 
             fullUrl += "?" + params;
         }
 
+        // Set the URL
         curl_easy_setopt(curl, CURLOPT_URL, fullUrl.c_str());
+        // Set the write callback function
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        // Set the data to pass to the callback function
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 
         // If POST method, set the POST fields
@@ -49,6 +70,28 @@ std::string makeHttpRequest(const std::string &url, const std::map<std::string, 
             curl_easy_setopt(curl, CURLOPT_POST, 1L);
             curl_easy_setopt(curl, CURLOPT_POSTFIELDS, params.c_str());
         }
+
+        // Set default headers
+        struct curl_slist *headers = NULL;
+
+        //'APCA-API-KEY-ID: PKCZJZQXZJZJZJZJZJZJ'
+
+
+        std::string key_id = "APCA-API-KEY-ID: " + apiKeyId;
+
+        std::string secret_id = "APCA-API-SECRET-KEY: " + apiSecretKey;
+
+
+
+
+
+
+
+        
+
+        headers = curl_slist_append(headers, key_id.c_str());
+        headers = curl_slist_append(headers, secret_id.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
         // Perform the request
         res = curl_easy_perform(curl);
@@ -60,8 +103,12 @@ std::string makeHttpRequest(const std::string &url, const std::map<std::string, 
         }
 
         // Cleanup
+        curl_slist_free_all(headers); // free the list of headers
         curl_easy_cleanup(curl);
     }
+
+
+    std::cout << "Response: " << readBuffer << std::endl;
 
     return readBuffer;
 }
