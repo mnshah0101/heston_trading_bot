@@ -6,7 +6,7 @@ double norm_cdf(double x) {
     return 0.5 * (1.0 + erf(x / sqrt(2.0)));
 }
 
-// Black-Scholes Pricer
+// Black-Scholes Pricer, returns call and put price
 void black_scholes_pricer(double S, double K, double T, double r, double vol, double *C, double *P) {
     double d1 = (log(S / K) + (r + 0.5 * vol * vol) * T) / (vol * sqrt(T));
     double d2 = d1 - vol * sqrt(T);
