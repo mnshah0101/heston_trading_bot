@@ -1,11 +1,35 @@
-#ifndef BLACK_SCHOLES_H
-#define BLACK_SCHOLES_H
+#ifndef BLACKSCHOLES_HPP
+#define BLACKSCHOLES_HPP
 
-#include <stdio.h>
-#include <math.h>
+#include <iostream>
+#include <cmath>
+#include <cstdlib>
 
-void black_scholes_pricer(double S, double K, double T, double r, double vol, double *C, double *P);
+using namespace std;
 
-double covered_call(double S, double K, double T, double r, double vol, double *profit_if_exercised, double *profit_if_not_exercised);
+double N(double z);
 
-#endif // BLACK_SCHOLES_H
+class BlackScholes
+{
+public:
+    BlackScholes(double callFlagInput, double SInput, double XInput, double rInput, double volInput, double TInput);
+    BlackScholes();
+    ~BlackScholes();
+
+    double d1();
+    double d2();
+    double Price();
+    void printTest();
+    void ErrorChecker();
+    
+    double callFlag;
+
+private:
+    double S;
+    double X;
+    double r;
+    double vol;
+    double T;
+};
+
+#endif // BLACKSCHOLES_HPP

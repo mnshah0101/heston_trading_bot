@@ -1,28 +1,18 @@
 #include <iostream>
 #include <vector>
 
-std::vector<double> rolling_slope(const std::vector<double> &arr, int windowSize)
+std::vector<double> calculate_slope(const std::vector<double> &arr)
 {
     std::vector<double> slopes;
 
-    if (arr.empty() || windowSize <= 1 || windowSize > arr.size())
+    if (arr.empty())
     {
         return slopes;
     }
 
-    for (int i = 0; i <= arr.size() - windowSize; ++i)
+    for (int i = 1; i < arr.size(); i++)
     {
-        double sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-        for (int j = 0; j < windowSize; ++j)
-        {
-            sumX += j;
-            sumY += arr[i + j];
-            sumXY += j * arr[i + j];
-            sumXX += j * j;
-        }
-
-        double slope = (windowSize * sumXY - sumX * sumY) / (windowSize * sumXX - sumX * sumX);
-        slopes.push_back(slope);
+        slopes.push_back(arr[i] - arr[i - 1]);
     }
 
     return slopes;

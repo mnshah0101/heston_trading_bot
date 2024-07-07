@@ -40,7 +40,7 @@ int main(){
 
     
 
-    std::string symbol = "FIS";
+    std::string symbol = "D";
     std::string qty = "1";
     std::string side = "buy";
     std::string type = "market";
@@ -54,7 +54,24 @@ int main(){
 
     std::cout << "Response: " << response.dump(4) << std::endl;
 
-    response = get_historical(symbol, "2024-03-01T09:30:00-04:00", "2024-07-05T16:00:00-04:00", "1Day");
+    response = get_historical(symbol, "2024-01-05T09:30:00-04:00", "2024-07-05T16:00:00-04:00", "1Day");
+
+    auto response2 = get_historical(symbol, "2015-01-05T09:30:00-04:00", "2024-07-05T16:00:00-04:00", "12Month");
+
+
+    //get historical volatility
+
+    auto bars_json2 = response2["bars"][symbol];
+
+    std::vector<double> bars2(bars_json2.size());
+
+    for(int i = 0; i < bars_json2.size(); i++){
+        bars2[i] = bars_json2[i]["c"];
+    }
+
+    auto std_dev_prices_historical = calculateStandardDeviation(bars2);
+
+    std::cout << "Standard Deviation of Prices: " << std_dev_prices_historical << std::endl;
 
     if (response.find("error") != response.end())
     {
@@ -62,7 +79,7 @@ int main(){
     }
     else
     {
-        std::cout << "Response: " << response.dump(4) << std::endl;
+        ;
     }
 
     auto bars_json = response["bars"][symbol];
@@ -76,27 +93,30 @@ int main(){
         bars[i] = bars_json[i]["c"];
     }
 
+    //print length of bars
+
+
 
  
 
     auto sma_bars = simple_moving_average(bars, 7);
 
-    for(int i = 0; i < sma_bars.size(); i++){
-        std::cout << sma_bars[i] << std::endl;
-    }
 
     auto normalized_sma_bars = normalize(sma_bars);
 
 
-    auto normalized_slope = rolling_slope(sma_bars, 7);
-    auto slope = rolling_slope(bars, 7);
+    auto normalized_slope = calculate_slope(sma_bars);
+    auto slope = calculate_slope(bars);
+
+   
+
+
+    //print length of slope
 
 
 
-    for (int i = 0; i < normalized_slope.size(); i++)
-    {
-        std::cout << normalized_slope[i] << std::endl;
-    }
+
+   
 
     bool isNeutralBullish = isNeutralBullishTrend(normalized_slope);
 
@@ -111,36 +131,60 @@ int main(){
     }
 
 
-    double std_slope = std::accumulate(slope.begin(), slope.end(), 0.0) / slope.size();
+    //get standard deviation of slope
 
-    double strike = bars[bars.size() - 1] * ((1 + std_slope)*0.95);
+    double std_dev = calculateStandardDeviation(normalized_slope);
+
+
+    double std_dev_prices = calculateStandardDeviation(bars);
+
+    std::cout << "Standard Deviation of Prices: " << std_dev_prices << std::endl;
 
 
 
+
+    double meanSlope = std::accumulate(normalized_slope.begin(), normalized_slope.end(), 0.0) / normalized_slope.size();
+
+
+    std::cout << "Standard Deviation: " << std_dev << std::endl;
+
+    std::cout << "Mean Slope: " << meanSlope << std::endl;
+
+    double strike = bars[bars.size() - 1] + ((meanSlope + 0.15*std_dev)*40);
 
     std::cout << "Last Stock Price: " << bars[bars.size() - 1] << std::endl;
     
 
     std::cout << "Strike: " << strike << std::endl;
 
-    double  profit_if_excercised;
+    double profit_if_excercised;
     double profit_if_not_excercised;
 
-    double time_to_expiration = 1/12;
+    double time_to_expiration =  60;
 
     double spot = bars[bars.size() - 1];
-    double risk_free_rate = 0.0429;
-    double vol = 0.7;
+    double risk_free_rate = 4.29;
+    double vol = std_dev_prices_historical / spot;
+
+    std::cout << "Volatility: " << vol << std::endl;
 
     double call_price, put_price;
-    black_scholes_pricer(spot, strike, time_to_expiration, risk_free_rate, vol, &call_price, &put_price);
-    printf("Call Price: %.2f\n", call_price);
-    printf("Put Price: %.2f\n", put_price);
 
-    double profit_if_exercised, profit_if_not_exercised;
-    covered_call(spot, strike, time_to_expiration, risk_free_rate, vol, &profit_if_exercised, &profit_if_not_exercised);
-    printf("Profit if Exercised: %.2f\n", profit_if_exercised);
-    printf("Profit if Not Exercised: %.2f\n", profit_if_not_exercised);
+
+
+    
+    BlackScholes call(1, spot, strike, risk_free_rate, vol, time_to_expiration);
+
+    call_price = call.Price();
+    
+
+
+    std::cout << "Call Price: " << call_price << std::endl;
+
+    
+    
+
+
 
     return 0;
 }

@@ -1,4 +1,4 @@
-# heston_trading_bot
+# black_scholes_merton trading bot
 Run command:
 cd build
 cmake ..

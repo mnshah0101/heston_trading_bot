@@ -7,5 +7,6 @@
 #include <normalize.hpp>
 #include <is_neutral_bullish.hpp>
 #include <black_scholes.hpp>
+#include <math_utils.hpp>
 
 #endif // UTILS_H

@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 
-std::vector<double> rolling_slope(const std::vector<double> &data, int period);
-
+std::vector<double> calculate_slope(const std::vector<double> &data);
 
 #endif // ROLLING_SLOPE_H
