@@ -28,3 +28,14 @@ json get_historical(const std::string &symbol, const std::string &start, const s
 
     return response;
 }
+
+// get historical volatility
+double calculate_historical_volatility(std::string &symbol, json bars_json) 
+{
+    std::vector<double> bars(bars_json.size());
+    for (int i = 0; i < bars_json.size(); i++) 
+    {
+        bars[i] = bars_json[i]["c"];
+    }
+    return calculateStandardDeviation(bars);
+}

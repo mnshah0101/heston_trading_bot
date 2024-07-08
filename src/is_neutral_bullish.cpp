@@ -3,9 +3,24 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
+#include <create_order.hpp>
+#include <sma.hpp>
+#include <rolling_slope.hpp>
 
-bool isNeutralBullishTrend(const std::vector<double> &slopes)
+bool isNeutralBullishTrend(std::string &symbol, json bars_json)
 {
+    // get historical data
+    std::vector<double> bars(bars_json.size());
+    for (int i = 0; i < bars_json.size(); i++)
+    {
+        bars[i] = bars_json[i]["c"];
+    }
+
+    // calculate slope
+    auto sma_bars = simple_moving_average(bars, 7);
+    auto slopes = calculate_slope(sma_bars);
+
+    // determine trend
     if (slopes.empty())
     {
         return false;
