@@ -7,9 +7,10 @@
 #include <sma.hpp>
 #include <rolling_slope.hpp>
 
-bool isNeutralBullishTrend(std::string &symbol, json bars_json)
+bool isNeutralBullishTrend(std::string &symbol, json response)
 {
     // get historical data
+    auto bars_json = response["bars"][symbol];
     std::vector<double> bars(bars_json.size());
     for (int i = 0; i < bars_json.size(); i++)
     {
